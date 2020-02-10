@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.outside.dto.Student;
+import com.example.outside.service.StudentServiceProxy;
 
 
 @RestController
 public class ExternalController {
 	
-	private static final String URL_ZUUL_SERVER="http://zuul-server";
+	/*private static final String URL_ZUUL_SERVER="http://zuul-server";
 	private static final String URL_DEMO_SERVICE="http://demo-service";
 	
 	@Bean
@@ -62,6 +63,23 @@ public class ExternalController {
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	public String getHello() {
 		return "Hello Demo. I'm External";
+	}*/
+	
+	@Autowired
+	private StudentServiceProxy proxy;
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Student> getStudent(@PathVariable Long id) {
+		Student response = proxy.retrieveStudentById(id);
+	    System.out.println(response);
+		return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 	
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public List<Student> getStudents() {
+		List<Student> response = proxy.retrieveStudentList();
+	    System.out.println(response.size());
+		return response;
+	}
+
 }
